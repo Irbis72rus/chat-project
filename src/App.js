@@ -17,12 +17,16 @@ function App() {
     messages: [],
   });
 
+  //Получаем переменную obj с фронта из JoinBlock
   const onLogin = async (obj) => {
     dispatch({
       type: 'JOINED',
       payload: obj,
     });
+    //После успешной авторизации оповещаем об этом сокеты
+    //Отправка сокет запроса на бэк через метод emit
     socket.emit('ROOM:JOIN', obj);
+    //В get запросе ждем от сервера актуальынй список пользователей и сообщений
     const { data } = await axios.get(`/rooms/${obj.roomId}`);
     dispatch({
       type: 'SET_DATA',
@@ -44,6 +48,7 @@ function App() {
     });
   };
 
+  //Когда происходит рендер - будет 1 слушатель
   React.useEffect(() => {
     socket.on('ROOM:SET_USERS', setUsers);
     socket.on('ROOM:NEW_MESSAGE', addMessage);
